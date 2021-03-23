@@ -39,10 +39,12 @@
 #define HAL_LIBRARY_PATH1 "/system/lib64/hw"
 #define HAL_LIBRARY_PATH2 "/vendor/lib64/hw"
 #define HAL_LIBRARY_PATH3 "/odm/lib64/hw"
+#define HAL_LIBRARY_PATH4 "/vendor_extra/lib64/hw"
 #else
 #define HAL_LIBRARY_PATH1 "/system/lib/hw"
 #define HAL_LIBRARY_PATH2 "/vendor/lib/hw"
 #define HAL_LIBRARY_PATH3 "/odm/lib/hw"
+#define HAL_LIBRARY_PATH4 "/vendor_extra/lib/hw"
 #endif
 
 /**
@@ -190,6 +192,12 @@ static int hw_module_exists(char *path, size_t path_len, const char *name,
     if (path_in_path(path, HAL_LIBRARY_PATH1) && access(path, R_OK) == 0)
         return 0;
 #endif
+
+    // Waydroid: check inside vendor_extra path as last fallback
+    snprintf(path, path_len, "%s/%s.%s.so",
+             HAL_LIBRARY_PATH4, name, subname);
+    if (path_in_path(path, HAL_LIBRARY_PATH4) && access(path, R_OK) == 0)
+        return 0;
 
     return -ENOENT;
 }
