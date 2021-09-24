@@ -80,7 +80,7 @@ static int load(const char *id,
     void *handle = NULL;
     struct hw_module_t *hmi = NULL;
 #ifdef __ANDROID_VNDK__
-    const bool try_system = false;
+    const bool try_system = property_get_bool("ro.vndk.lite", false);
 #else
     const bool try_system = true;
 #endif
@@ -174,6 +174,12 @@ static bool path_in_path(const char *path, const char *in_path) {
 static int hw_module_exists(char *path, size_t path_len, const char *name,
                             const char *subname)
 {
+#ifdef __ANDROID_VNDK__
+    const bool try_system = property_get_bool("ro.vndk.lite", false);
+#else
+    const bool try_system = true;
+#endif
+
     snprintf(path, path_len, "%s/%s.%s.so",
              HAL_LIBRARY_PATH3, name, subname);
     if (path_in_path(path, HAL_LIBRARY_PATH3) && access(path, R_OK) == 0)
@@ -184,12 +190,10 @@ static int hw_module_exists(char *path, size_t path_len, const char *name,
     if (path_in_path(path, HAL_LIBRARY_PATH2) && access(path, R_OK) == 0)
         return 0;
 
-#ifndef __ANDROID_VNDK__
     snprintf(path, path_len, "%s/%s.%s.so",
              HAL_LIBRARY_PATH1, name, subname);
-    if (path_in_path(path, HAL_LIBRARY_PATH1) && access(path, R_OK) == 0)
+    if (try_system && path_in_path(path, HAL_LIBRARY_PATH1) && access(path, R_OK) == 0)
         return 0;
-#endif
 
     // Waydroid: check inside vendor_extra path as last fallback
     snprintf(path, path_len, "%s/%s.%s.so",
