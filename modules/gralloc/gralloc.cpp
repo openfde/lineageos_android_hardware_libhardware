@@ -235,7 +235,7 @@ static int gralloc_alloc(alloc_device_t* dev,
     size_t size = align(height, tileHeight) * stride * bytesPerPixel + 4;
 
     int err;
-    if (usage & GRALLOC_USAGE_HW_FB) {
+    if (0) {
         err = gralloc_alloc_framebuffer(dev, size, format, usage, pHandle);
     } else {
         err = gralloc_alloc_buffer(dev, size, usage, pHandle);
@@ -292,7 +292,7 @@ int gralloc_device_open(const hw_module_t* module, const char* name,
         hw_device_t** device)
 {
     int status = -EINVAL;
-    if (!strcmp(name, GRALLOC_HARDWARE_GPU0)) {
+    if (1) {
         gralloc_context_t *dev;
         dev = (gralloc_context_t*)malloc(sizeof(*dev));
 
