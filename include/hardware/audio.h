@@ -865,6 +865,50 @@ struct audio_hw_device {
      */
     int (*remove_device_effect)(struct audio_hw_device *dev,
                         audio_port_handle_t device, effect_handle_t effect);
+
+    /**
+     * get all available input/output devices info.
+     *
+     * @param dev the audio HAL device context.
+     * @param input if a input device.
+     * @return retval devices info like: "name1 port1=Description1=volume1=mute1;name2 port2=Description2=volume2=mute2;name3 port3=Description3".
+     *               fist one is the default device, when more than one port, only the active port have volume and mute info.
+     */
+    char *(*get_devs)(struct audio_hw_device *dev, bool input);
+
+    /**
+     * set volume for a input/output device.
+     *
+     * @param dev the audio HAL device context.
+     * @param input if a input device.
+     * @param dev_name device name+port can find in pactl.
+     * @param volume volume to set[0,1].
+     * @return retval operation completion status.
+     */
+    int (*set_dev_volume)(struct audio_hw_device *dev, bool input, const char *dev_name, float volume);
+
+    /**
+     * set/unset a input/output device mute.
+     *
+     * @param dev the audio HAL device context.
+     * @param input if a input device.
+     * @param dev_name device name+port can find in pactl.
+     * @param mute mute/umute.
+     * @return retval operation completion status.
+     */
+    int (*set_dev_mute)(struct audio_hw_device *dev, bool input, const char *dev_name, bool mute);
+
+    /**
+     * set a input/output device as the default device.
+     *
+     * @param dev the audio HAL device context.
+     * @param input if a input device.
+     * @param dev_name device name+port can find in pactl.
+     * @param need_info if true hope get the new default device info.
+     * @return retval if need_info=true new default device info like : "volume=mute".
+     *                else have error: "1", have no error: "0".
+     */
+    char *(*set_default_dev)(struct audio_hw_device *dev, bool input, const char *dev_name, bool need_info);
 };
 typedef struct audio_hw_device audio_hw_device_t;
 
